@@ -626,6 +626,7 @@ const runCommand = (command) => {
           const pid = args[1] || "self";
           const status = fs.readFileSync(`/proc/${pid}/status`, 'utf-8');
           const capabilities = status.match(/Cap(.*?)\n/);
+
           for (var i = 0; i < capabilities.length; i++) {
             // Match each capability flag and convert to the human readable form
             const capInt = parseInt(capabilities[i].split(':')[1], 16);
@@ -663,6 +664,7 @@ const runCommand = (command) => {
           }
           prompt();
           break;
+          
         default:
           console.log('Usage: capsh -p');
           prompt();
