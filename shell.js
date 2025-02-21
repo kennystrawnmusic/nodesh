@@ -218,7 +218,7 @@ const runCommand = (command) => {
         }
       }
       else {
-        const rmFile = args[0];
+        const rmFile = rmOption;
         if (rmFile) {
           fs.unlink(rmFile, (err) => {
             if (err) {
@@ -616,7 +616,7 @@ const runCommand = (command) => {
         });
       });
       break;
-      
+
     default:
       const child = cp.spawn(cmd, args);
       
