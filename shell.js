@@ -17,7 +17,108 @@ const runCommand = (command) => {
     case 'exit':
       process.exit(0);
       break;
-      
+
+    case 'help':
+      console.log(`
+        Available commands:
+        - exit: Exit the shell
+        - help: Show this help message
+        - source <file>: Execute commands from a file
+        - cd <directory>: Change directory
+        - cd-: Change to the previous directory
+        - cd..: Change to the parent directory
+        - cd~: Change to the home directory
+        - ls: List files in the current directory
+        - pwd: Print the current working directory
+        - mkdir <directory>: Create a directory
+        - rmdir <directory>: Remove a directory
+        - touch <file>: Create a file
+        - rm <file>: Remove a file
+        - cp <source> <destination>: Copy a file
+        - mv <source> <destination>: Move a file
+        - echo <text>: Print text to the console
+        - ping <hostname> [port]: Ping a host
+        - whoami: Print the current user
+        - uname [-a | -s | -n]: Print system information
+        - date [-u | -r <file>]: Print the current date or file modification date
+        - df [-h | -i]: Print disk space usage
+        - du [-h | -a]: Print directory size
+        - ps [-a | -u]: Print process status
+        - kill <pid>: Kill a process
+        - id [-u | -g | -G]: Print user and group IDs
+        - env: Print environment variables
+        - history: Print command history
+        - savehistory <command>: Save command to history
+        - chmod <permissions> <file>: Change file permissions
+        - chown <owner> <file>: Change file owner
+        - grep <pattern> <file>: Search for a pattern in a file
+        - find <directory> <name>: Find files in a directory
+        - cd <directory>: Change directory
+        - cat <file>: Print file contents
+        - wget <url> <destination>: Download a file from a URL
+        - curl <url> <destination>: Download a file from a URL
+        - clear: Clear the console
+        `
+      );
+      prompt();
+      break;
+
+    case 'source':
+      const sourceFile = args[0];
+      if (sourceFile) {
+        fs.readFile(sourceFile, 'utf-8', (err, data) => {
+          if (err) {
+            console.error(`Error reading file: ${err.message}`);
+          } else {
+            const commands = data.split('\n');
+            commands.forEach((cmd) => {
+              runCommand(cmd);
+            });
+          }
+          prompt();
+        });
+      }
+      else {
+        console.log('Usage: source <file>');
+        prompt();
+      }
+      break;
+
+    case 'cd':
+      const dir = args[0];
+      if (dir) {
+        try {
+          process.chdir(dir);
+        } catch (err) {
+          console.error(`Error: ${err.message}`);
+        }
+      } else {
+        process.chdir(os.homedir());
+      }
+      prompt();
+      break;
+
+    case 'cd-':
+      const previousDir = process.env.PREVIOUS_DIR;
+      if (previousDir) {
+        process.chdir(previousDir);
+        console.log(`Changed directory to ${previousDir}`);
+      } else {
+        console.log('No previous directory found.');
+      }
+      prompt();
+      break;
+
+    case 'cd..':
+      process.chdir('..');
+      prompt();
+      break;
+
+    case 'cd~':
+      process.chdir(os.homedir());
+      prompt();
+      break;
+
     case 'ls':
       const lsdir = args[0];
       if(lsdir) {
@@ -99,19 +200,38 @@ const runCommand = (command) => {
       break;
 
     case 'rm':
-      const rmFileName = args[0];
-      if (rmFileName) {
-        fs.unlink(rmFileName, (err) => {
-          if (err) {
-            console.error(`Error removing file: ${err.message}`);
-          } else {
-            console.log(`File ${rmFileName} removed`);
-          }
+      const rmOption = args[0];
+      if (rmOption === '-rf') {
+        const rmDir = args[1];
+        if (rmDir) {
+          fs.rmdir(rmDir, { recursive: true }, (err) => {
+            if (err) {
+              console.error(`Error removing directory: ${err.message}`);
+            } else {
+              console.log(`Directory ${rmDir} removed`);
+            }
+            prompt();
+          });
+        } else {
+          console.log('Usage: rm -rf <directory_name>');
           prompt();
-        });
-      } else {
-        console.log('Usage: rm <file_name>');
-        prompt();
+        }
+      }
+      else {
+        const rmFile = args[0];
+        if (rmFile) {
+          fs.unlink(rmFile, (err) => {
+            if (err) {
+              console.error(`Error removing file: ${err.message}`);
+            } else {
+              console.log(`File ${rmFile} removed`);
+            }
+            prompt();
+          });
+        } else {
+          console.log('Usage: rm <file_name>');
+          prompt();
+        }
       }
       break;
 
@@ -132,6 +252,7 @@ const runCommand = (command) => {
         prompt();
       }
       break;
+
     case 'mv':
       const mvSource = args[0];
       const mvDest = args[1];
@@ -149,6 +270,7 @@ const runCommand = (command) => {
         prompt();
       }
       break;
+
     case 'echo':
       const echoText = args.join(' ');
       if (echoText) {
@@ -158,6 +280,7 @@ const runCommand = (command) => {
       }
       prompt();
       break;
+
     case 'ping':
       const host = args[0];
       const port = args[1] || 80;
@@ -196,6 +319,7 @@ const runCommand = (command) => {
       }
       prompt();
       break;
+
     case 'date':
       const dateOption = args[0];
       switch (dateOption) {
@@ -211,6 +335,7 @@ const runCommand = (command) => {
       }
       prompt();
       break;
+
     case 'df':
       const dfOption = args[0];
       switch (dfOption) {
@@ -227,6 +352,7 @@ const runCommand = (command) => {
       }
       prompt();
       break;
+
     case 'du':
       const duOption = args[0];
       switch (duOption) {
@@ -246,6 +372,7 @@ const runCommand = (command) => {
       }
       prompt();
       break;
+
     case 'ps':
       const psOption = args[0];
       switch (psOption) {
@@ -262,6 +389,7 @@ const runCommand = (command) => {
       }
       prompt();
       break;
+
     case 'kill':
       const pid = args[0];
       if (pid) {
@@ -276,6 +404,7 @@ const runCommand = (command) => {
       }
       prompt();
       break;
+
     case 'id':
       const idOption = args[0];
       switch (idOption) {
@@ -293,6 +422,7 @@ const runCommand = (command) => {
       }
       prompt();
       break;
+      
     case 'env':
       console
         .log('Environment Variables:');
@@ -303,6 +433,7 @@ const runCommand = (command) => {
       console.log('------------------------');
       prompt();
       break;
+
     case 'history':
       console.log('Command History:');
       console.log('----------------');
@@ -314,6 +445,7 @@ const runCommand = (command) => {
       }
       prompt();
       break;
+
     case 'savehistory':
       const historyCommand = args.join(' ');
       if (historyCommand) {
@@ -330,6 +462,7 @@ const runCommand = (command) => {
         prompt();
       }
       break;
+
     case 'chmod':
       const permissions = args[0];
       const chmodFile = args[1];
@@ -347,6 +480,7 @@ const runCommand = (command) => {
         prompt();
       }
       break;
+
     case 'chown':
       const owner = args[0];
       const chownFile = args[1];
@@ -364,6 +498,7 @@ const runCommand = (command) => {
         prompt();
       }
       break;
+
     case 'grep':
       const grepPattern = args[0];
       const grepFile = args[1];
@@ -386,6 +521,7 @@ const runCommand = (command) => {
         prompt();
       }
       break;
+
     case 'find':
       const findDir = args[0];
       const findName = args[1];
@@ -406,20 +542,6 @@ const runCommand = (command) => {
         console.log('Usage: find <directory> <name>');
         prompt();
       }
-      break;
-    case 'cd':
-      const dir = args[0];
-      if (dir) {
-        try {
-          process.chdir(dir);
-        } catch (err) {
-          console.error(`Error: ${err.message}`);
-        }
-      } else {
-        console.log(os.homedir());
-        process.chdir(os.homedir());
-      }
-      prompt();
       break;
       
     case 'cat':
@@ -494,9 +616,7 @@ const runCommand = (command) => {
         });
       });
       break;
-    
-    
-
+      
     default:
       const child = cp.spawn(cmd, args);
       
