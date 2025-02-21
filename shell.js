@@ -21,7 +21,6 @@ const runCommand = (command) => {
         - help: Show this help message
         - source <file>: Execute commands from a file
         - cd <directory>: Change directory
-        - cd-: Change to the previous directory
         - cd..: Change to the parent directory
         - cd~: Change to the home directory
         - ls: List files in the current directory
@@ -92,16 +91,6 @@ const runCommand = (command) => {
       }
       prompt();
 
-    case 'cd-':
-      const previousDir = process.env.PREVIOUS_DIR;
-      if (previousDir) {
-        process.chdir(previousDir);
-        console.log(`Changed directory to ${previousDir}`);
-      } else {
-        console.log('No previous directory found.');
-      }
-
-      prompt();
     case 'cd..':
       process.chdir('..');
       prompt();
