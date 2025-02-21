@@ -666,7 +666,7 @@ const runCommand = (command) => {
           break;
           
         default:
-          console.log('Usage: capsh -p');
+          console.log('Usage: capsh -p [PID]');
           prompt();
       }
 
