@@ -9,15 +9,11 @@ const https = require('https');
 const { URL } = require('url');
 const net = require("net");
 const cp = require("child_process");
-
 const runCommand = (command) => {
   const [cmd, ...args] = command.trim().split(' ');
-
   switch (cmd) {
     case 'exit':
       process.exit(0);
-      break;
-
     case 'help':
       console.log(`
         Available commands:
@@ -62,8 +58,7 @@ const runCommand = (command) => {
         `
       );
       prompt();
-      break;
-
+      
     case 'source':
       const sourceFile = args[0];
       if (sourceFile) {
@@ -83,7 +78,6 @@ const runCommand = (command) => {
         console.log('Usage: source <file>');
         prompt();
       }
-      break;
 
     case 'cd':
       const dir = args[0];
@@ -97,7 +91,6 @@ const runCommand = (command) => {
         process.chdir(os.homedir());
       }
       prompt();
-      break;
 
     case 'cd-':
       const previousDir = process.env.PREVIOUS_DIR;
@@ -107,18 +100,15 @@ const runCommand = (command) => {
       } else {
         console.log('No previous directory found.');
       }
-      prompt();
-      break;
 
+      prompt();
     case 'cd..':
       process.chdir('..');
       prompt();
-      break;
 
     case 'cd~':
       process.chdir(os.homedir());
       prompt();
-      break;
 
     case 'ls':
       const lsdir = args[0];
@@ -141,12 +131,10 @@ const runCommand = (command) => {
           prompt();
         });
       }
-      break;
       
     case 'pwd':
       console.log(process.cwd());
       prompt();
-      break;
     
     case 'mkdir':
       const dirName = args[0];
@@ -163,7 +151,6 @@ const runCommand = (command) => {
         console.log('Usage: mkdir <directory_name>');
         prompt();
       }
-      break;
 
     case 'rmdir':
       const rmDirName = args[0];
@@ -180,7 +167,6 @@ const runCommand = (command) => {
         console.log('Usage: rmdir <directory_name>');
         prompt();
       }
-      break;
     
     case 'touch':
       const fileName = args[0];
@@ -198,7 +184,6 @@ const runCommand = (command) => {
         console.log('Usage: touch <file_name>');
         prompt();
       }
-      break;
 
     case 'rm':
       const rmOption = args[0];
@@ -234,7 +219,6 @@ const runCommand = (command) => {
           prompt();
         }
       }
-      break;
 
     case 'cp':
       const source = args[0];
@@ -252,7 +236,6 @@ const runCommand = (command) => {
         console.log('Usage: cp <source_file> <destination_file>');
         prompt();
       }
-      break;
 
     case 'mv':
       const mvSource = args[0];
@@ -270,7 +253,6 @@ const runCommand = (command) => {
         console.log('Usage: mv <source_file> <destination_file>');
         prompt();
       }
-      break;
 
     case 'echo':
       const echoText = args.join(' ');
@@ -280,7 +262,6 @@ const runCommand = (command) => {
         console.log('Usage: echo <text>');
       }
       prompt();
-      break;
 
     case 'ping':
       const host = args[0];
@@ -289,108 +270,114 @@ const runCommand = (command) => {
         const client = net.createConnection(port, host, () => {
           console.log(`Ping to ${host}:${port} successful`);
           client.end();
+          prompt();
         });
-
         client.on('error', (err) => {
           console.error(`Ping to ${host}:${port} failed: ${err.message}`);
+          prompt();
         });
       } else {
         console.log('Usage: ping <hostname> [port]');
+        prompt();
       }
-      break;
+      
     case 'whoami':
       console.log(process.env.USER || process.env.USERNAME);
       prompt();
-      break;
-
     case 'uname':
       const unameOption = args[0];
       switch (unameOption) {
         case '-a':
           console.log(`System: ${os.type()} ${os.release()} ${os.platform()}`);
-          break;
+          prompt();
+          
         case '-s':
           console.log(os.type());
-          break;
+          prompt();
+          
         case '-n':
           console.log(os.hostname());
-          break;
+          prompt();
+          
         default:
           console.log('Usage: uname [-a | -s | -n]');
       }
       prompt();
-      break;
-
     case 'date':
       const dateOption = args[0];
       switch (dateOption) {
         case '-u':
           console.log(new Date().toUTCString());
-          break;
+          prompt();
+          
         case '-r':
           const fileDate = fs.statSync(args[1]).mtime;
           console.log(fileDate);
-          break;
+          prompt();
         default:
           console.log(new Date().toString());
+          prompt();
       }
       prompt();
-      break;
-
     case 'df':
       const dfOption = args[0];
       switch (dfOption) {
         case '-h':
           const { size, free } = fs.statvfsSync('/');
           console.log(`Size: ${size}, Free: ${free}`);
-          break;
+          prompt();
         case '-i':
           const { files, freeFiles } = fs.statvfsSync('/');
           console.log(`Files: ${files}, Free Files: ${freeFiles}`);
-          break;
+          prompt();
+          
         default:
           console.log('Usage: df [-h | -i]');
+          prompt();
       }
       prompt();
-      break;
-
+      
     case 'du':
       const duOption = args[0];
       switch (duOption) {
         case '-h':
           const { size: dirSize } = fs.statSync(args[1]);
           console.log(`Directory size: ${dirSize}`);
-          break;
+          prompt();
+          
         case '-a':
           const files = fs.readdirSync(args[1]);
           files.forEach((file) => {
             const { size } = fs.statSync(`${args[1]}/${file}`);
             console.log(`${file}: ${size}`);
           });
-          break;
+          prompt();
+          
         default:
           console.log('Usage: du [-h | -a]');
+          prompt();
       }
       prompt();
-      break;
-
+      
     case 'ps':
       const psOption = args[0];
       switch (psOption) {
         case '-a':
           const processes = cp.execSync('ps -a').toString();
           console.log(processes);
-          break;
+          prompt();
+          
         case '-u':
           const userProcesses = cp.execSync('ps -u').toString();
           console.log(userProcesses);
-          break;
+          prompt();
+          
         default:
           console.log('Usage: ps [-a | -u]');
+          prompt();
       }
       prompt();
-      break;
-
+      
     case 'kill':
       const pid = args[0];
       if (pid) {
@@ -404,26 +391,28 @@ const runCommand = (command) => {
         console.log('Usage: kill <pid>');
       }
       prompt();
-      break;
-
+      
     case 'id':
       const idOption = args[0];
       switch (idOption) {
         case '-u':
           console.log(process.getuid());
-          break;
+          prompt();
+          
         case '-g':
           console.log(process.getgid());
-          break;
+          prompt();
+          
         case '-G':
           console.log(process.getgroups());
-          break;
+          prompt();
+          
         default:
           console.log('Usage: id [-u | -g | -G]');
+          prompt();
       }
       prompt();
-      break;
-      
+
     case 'env':
       console
         .log('Environment Variables:');
@@ -433,8 +422,7 @@ const runCommand = (command) => {
       }
       console.log('------------------------');
       prompt();
-      break;
-
+      
     case 'history':
       console.log('Command History:');
       console.log('----------------');
@@ -445,8 +433,7 @@ const runCommand = (command) => {
         console.log('No command history found.');
       }
       prompt();
-      break;
-
+      
     case 'savehistory':
       const historyCommand = args.join(' ');
       if (historyCommand) {
@@ -462,8 +449,7 @@ const runCommand = (command) => {
         console.log('Usage: savehistory <command>');
         prompt();
       }
-      break;
-
+      
     case 'chmod':
       const permissions = args[0];
       const chmodFile = args[1];
@@ -480,8 +466,7 @@ const runCommand = (command) => {
         console.log('Usage: chmod <permissions> <file>');
         prompt();
       }
-      break;
-
+      
     case 'chown':
       const owner = args[0];
       const chownFile = args[1];
@@ -498,8 +483,7 @@ const runCommand = (command) => {
         console.log('Usage: chown <owner> <file>');
         prompt();
       }
-      break;
-
+      
     case 'grep':
       const grepPattern = args[0];
       const grepFile = args[1];
@@ -521,8 +505,7 @@ const runCommand = (command) => {
         console.log('Usage: grep <pattern> <file>');
         prompt();
       }
-      break;
-
+      
     case 'find':
       const findDir = args[0];
       const findName = args[1];
@@ -543,8 +526,7 @@ const runCommand = (command) => {
         console.log('Usage: find <directory> <name>');
         prompt();
       }
-      break;
-      
+
     case 'cat':
       const file = args[0];
       if (file) {
@@ -560,8 +542,7 @@ const runCommand = (command) => {
         console.log('Usage: cat <filename>');
         prompt();
       }
-      break;
-      
+
     case 'wget':
       const url = args[0];
       const dest = args[1];
@@ -573,25 +554,20 @@ const runCommand = (command) => {
         if (response.statusCode !== 200) {
           console.log(`Download failed with status code ${response.statusCode}`);
         }
-
         const file = fs.createWriteStream(dest);
         response.pipe(file);
-
         file.on('finish', () => {
           console.log(`Successfully downloaded ${dest}`);
           file.close();
         });
-
         file.on('error', (err) => {
           fs.unlink(dest, () => console.log(`Error writing file: ${err}`));
         });
       });
-      break;
-      
+
     case 'clear':
       console.clear();
-      break;
-
+      
     case 'curl':
       const curlUrl = args[0];
       const curlDest = args[1];
@@ -603,21 +579,17 @@ const runCommand = (command) => {
         if (response.statusCode !== 200) {
           console.log(`Download failed with status code ${response.statusCode}`);
         }
-
         const file = fs.createWriteStream(curlDest);
         response.pipe(file);
-
         file.on('finish', () => {
           console.log(`Successfully downloaded ${curlDest}`);
           file.close();
         });
-
         file.on('error', (err) => {
           fs.unlink(curlDest, () => console.log(`Error writing file: ${err}`));
         });
       });
-      break;
-
+      
     case 'capsh':
       const capshOpt = args[0];
       switch (capshOpt) {
@@ -626,7 +598,6 @@ const runCommand = (command) => {
           const pid = args[1] || "self";
           const status = fs.readFileSync(`/proc/${pid}/status`, 'utf-8');
           const capabilities = status.match(/Cap(.*?)\n/);
-
           for (var i = 0; i < capabilities.length; i++) {
             // Match each capability flag and convert to the human readable form
             const capInt = parseInt(capabilities[i].split(':')[1], 16);
@@ -659,12 +630,10 @@ const runCommand = (command) => {
             const cap_sys_tty_config = (capInt & 0x2000000) ? 'cap_sys_tty_config' : '';
             const cap_mknod = (capInt & 0x4000000) ? 'cap_mknod' : '';
             const cap_lease = (capInt & 0x8000000) ? 'cap_lease' : '';
-
             console.log(`Capabilities: ${cap_dac_override} ${cap_dac_read_search} ${cap_fowner} ${cap_fsetid} ${cap_kill} ${cap_setgid} ${cap_setuid} ${cap_setpcap} ${cap_linux_immutable} ${cap_net_bind_service} ${cap_net_broadcast} ${cap_net_admin} ${cap_net_raw} ${cap_ipc_lock} ${cap_ipc_owner} ${cap_sys_module} ${cap_sys_rawio} ${cap_sys_chroot} ${cap_sys_ptrace} ${cap_sys_pacct} ${cap_sys_admin} ${cap_sys_boot} ${cap_sys_nice} ${cap_sys_resource} ${cap_sys_time} ${cap_sys_tty_config} ${cap_mknod} ${cap_lease}`);
           }
           prompt();
-          break;
-          
+
         default:
           console.log('Usage: capsh -p [PID]');
           prompt();
@@ -676,15 +645,12 @@ const runCommand = (command) => {
       child.on('error', (err) => {
          console.log(`${cmd}: command not found`);
       });
-
       child.stdout.on('data', (data) => {
         process.stdout.write(data);
       });
-
       child.stderr.on('data', (data) => {
         process.stderr.write(data);
       });
-
       child.on('close', (code) => {
         // already handle the "Not Found" case with the onerror event
         if (code === 0 || code !== -2 || code !== 127) {
@@ -695,11 +661,9 @@ const runCommand = (command) => {
       prompt();
   }
 };
-
 const prompt = () => {
   readline.question(`${process.cwd()} $ `, (command) => {
     runCommand(command);
   });
 };
-
 prompt();
