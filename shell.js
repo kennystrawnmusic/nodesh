@@ -57,6 +57,7 @@ const runCommand = (command) => {
         - cat <file>: Print file contents
         - wget <url> <destination>: Download a file from a URL
         - curl <url> <destination>: Download a file from a URL
+        - capsh -p: Enumerate capabilities of Node process to chart path to possible container escape
         - clear: Clear the console
         `
       );
