@@ -662,7 +662,7 @@ const runCommand = (command) => {
           prompt();
           break;
         default:
-          console.log('Usage: capsh');
+          console.log('Usage: capsh -p');
           prompt();
       }
 
