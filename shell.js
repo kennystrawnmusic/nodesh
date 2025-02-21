@@ -57,7 +57,7 @@ const runCommand = (command) => {
         - cat <file>: Print file contents
         - wget <url> <destination>: Download a file from a URL
         - curl <url> <destination>: Download a file from a URL
-        - capsh -p: Enumerate capabilities of Node process to chart path to possible container escape
+        - capsh -p [PID]: Enumerate capabilities of Node process to chart path to possible container escape
         - clear: Clear the console
         `
       );
@@ -623,7 +623,8 @@ const runCommand = (command) => {
       switch (capshOpt) {
         // Add functionality for decoding capabilities flags retrieved from /proc/self/status
         case '-p':
-          const status = fs.readFileSync('/proc/self/status', 'utf-8');
+          const procToPrint = args[1] || "self";
+          const status = fs.readFileSync(`/proc/${procToPrint}/status`, 'utf-8');
           const capabilities = status.match(/Cap(.*?)\n/);
           for (var i = 0; i < capabilities.length; i++) {
             // Match each capability flag and convert to the human readable form
