@@ -623,8 +623,8 @@ const runCommand = (command) => {
       switch (capshOpt) {
         // Add functionality for decoding capabilities flags retrieved from /proc/self/status
         case '-p':
-          const procToPrint = args[1] || "self";
-          const status = fs.readFileSync(`/proc/${procToPrint}/status`, 'utf-8');
+          const pid = args[1] || "self";
+          const status = fs.readFileSync(`/proc/${pid}/status`, 'utf-8');
           const capabilities = status.match(/Cap(.*?)\n/);
           for (var i = 0; i < capabilities.length; i++) {
             // Match each capability flag and convert to the human readable form
