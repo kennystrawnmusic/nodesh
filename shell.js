@@ -618,33 +618,54 @@ const runCommand = (command) => {
       break;
 
     case 'capsh':
-      console.log('Current capabilities:');
-      console.log(process.getegid());
-      console.log(process.geteuid());
-      console.log(process.getgroups());
-      console.log(process.getgid());
-      console.log(process.getuid());
-      prompt();
-      break;
+      const capshOpt = args[0];
+      switch (capshOpt) {
+        // Add functionality for decoding capabilities flags retrieved from /proc/self/status
+        case '-p':
+          const status = fs.readFileSync('/proc/self/status', 'utf-8');
+          const capabilities = status.match(/Cap(.*?)\n/);
+          for (var i = 0; i < capabilities.length; i++) {
+            // Match each capability flag and convert to the human readable form
+            const capInt = parseInt(capabilities[i].split(':')[1], 16);
+            
+            const cap_dac_override = (capInt & 1) ? 'cap_dac_override' : '';
+            const cap_dac_read_search = (capInt & 2) ? 'cap_dac_read_search' : '';
+            const cap_fowner = (capInt & 4) ? 'cap_fowner' : '';
+            const cap_fsetid = (capInt & 8) ? 'cap_fsetid' : '';
+            const cap_kill = (capInt & 16) ? 'cap_kill' : '';
+            const cap_setgid = (capInt & 32) ? 'cap_setgid' : '';
+            const cap_setuid = (capInt & 64) ? 'cap_setuid' : '';
+            const cap_setpcap = (capInt & 128) ? 'cap_setpcap' : '';
+            const cap_linux_immutable = (capInt & 256) ? 'cap_linux_immutable' : '';
+            const cap_net_bind_service = (capInt & 512) ? 'cap_net_bind_service' : '';
+            const cap_net_broadcast = (capInt & 1024) ? 'cap_net_broadcast' : '';
+            const cap_net_admin = (capInt & 2048) ? 'cap_net_admin' : '';
+            const cap_net_raw = (capInt & 4096) ? 'cap_net_raw' : '';
+            const cap_ipc_lock = (capInt & 8192) ? 'cap_ipc_lock' : '';
+            const cap_ipc_owner = (capInt & 16384) ? 'cap_ipc_owner' : '';
+            const cap_sys_module = (capInt & 32768) ? 'cap_sys_module' : '';
+            const cap_sys_rawio = (capInt & 65536) ? 'cap_sys_rawio' : '';
+            const cap_sys_chroot = (capInt & 131072) ? 'cap_sys_chroot' : '';
+            const cap_sys_ptrace = (capInt & 262144) ? 'cap_sys_ptrace' : '';
+            const cap_sys_pacct = (capInt & 524288) ? 'cap_sys_pacct' : '';
+            const cap_sys_admin = (capInt & 1048576) ? 'cap_sys_admin' : '';
+            const cap_sys_boot = (capInt & 2097152) ? 'cap_sys_boot' : '';
+            const cap_sys_nice = (capInt & 4194304) ? 'cap_sys_nice' : '';
+            const cap_sys_resource = (capInt & 8388608) ? 'cap_sys_resource' : '';
+            const cap_sys_time = (capInt & 16777216) ? 'cap_sys_time' : '';
+            const cap_sys_tty_config = (capInt & 33554432) ? 'cap_sys_tty_config' : '';
+            const cap_mknod = (capInt & 67108864) ? 'cap_mknod' : '';
+            const cap_lease = (capInt & 134217728) ? 'cap_lease' : '';
 
-    case 'setcap':
-      const cap = args[0];
-      const capFile = args[1];
-      if (cap && capFile) {
-        fs.chmod(capFile, cap, (err) => {
-          if (err) {
-            console.error(`Error changing file capabilities: ${err.message}`);
-          } else {
-            console.log(`Capabilities changed for ${capFile}`);
+            console.log(`Capabilities: ${cap_dac_override} ${cap_dac_read_search} ${cap_fowner} ${cap_fsetid} ${cap_kill} ${cap_setgid} ${cap_setuid} ${cap_setpcap} ${cap_linux_immutable} ${cap_net_bind_service} ${cap_net_broadcast} ${cap_net_admin} ${cap_net_raw} ${cap_ipc_lock} ${cap_ipc_owner} ${cap_sys_module} ${cap_sys_rawio} ${cap_sys_chroot} ${cap_sys_ptrace} ${cap_sys_pacct} ${cap_sys_admin} ${cap_sys_boot} ${cap_sys_nice} ${cap_sys_resource} ${cap_sys_time} ${cap_sys_tty_config} ${cap_mknod} ${cap_lease}`);
           }
           prompt();
-        });
-      } else {
-        console.log('Usage: setcap <capabilities> <file>');
-        prompt();
+          break;
+        default:
+          console.log('Usage: capsh');
+          prompt();
       }
-      break;
-      
+
     default:
       const child = cp.spawn(cmd, args);
       
