@@ -617,6 +617,34 @@ const runCommand = (command) => {
       });
       break;
 
+    case 'capsh':
+      console.log('Current capabilities:');
+      console.log(process.getegid());
+      console.log(process.geteuid());
+      console.log(process.getgroups());
+      console.log(process.getgid());
+      console.log(process.getuid());
+      prompt();
+      break;
+
+    case 'setcap':
+      const cap = args[0];
+      const capFile = args[1];
+      if (cap && capFile) {
+        fs.chmod(capFile, cap, (err) => {
+          if (err) {
+            console.error(`Error changing file capabilities: ${err.message}`);
+          } else {
+            console.log(`Capabilities changed for ${capFile}`);
+          }
+          prompt();
+        });
+      } else {
+        console.log('Usage: setcap <capabilities> <file>');
+        prompt();
+      }
+      break;
+      
     default:
       const child = cp.spawn(cmd, args);
       
